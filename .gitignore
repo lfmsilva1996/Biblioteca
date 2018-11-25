@@ -1,32 +1,133 @@
-# Prerequisites
-*.d
+// Desenvolvido por: Luis Fernando Machado	
+// Desenvolvido por: Lucas Junio de Oliveira
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+#include "stdafx.h"
+#include "stdafx.h"
+#include "stdio.h"
+#include "stdlib.h"
+#include "string.h"
+#include "malloc.h"
 
-# Precompiled Headers
-*.gch
-*.pch
+#define tam 10
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+struct exemplares {
+	int codigo;
+	char titulo[100];
+	char autor[41];
+	char area[7];
+};
+typedef struct exemplares Acervo;
+typedef Acervo* Hash[tam];
 
-# Fortran module files
-*.mod
-*.smod
+int funcao_Esp(int codigo) {
+	return (codigo % tam);
+}
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
+Acervo* insere_Esp (Hash tab, int codigo, const char* titulo, const char* autor, const char* area) {
+	int h = funcao_Esp(codigo);
 
-# Executables
-*.exe
-*.out
-*.app
+	//Criamos a alocação dinâmica de memória do tipo Acervo
+	if (tab[h] == NULL) {
+		tab[h] = (Acervo*)malloc(sizeof(Acervo));
+
+		// O campo código da alocação recebe o código do livro
+		tab[h]->codigo = codigo;
+	}
+	//A função strcpy copia o texto da variável vinda pelo parâmetro para o campo do ponteiro
+	strcpy_s(tab[h]->titulo, titulo);
+	strcpy_s(tab[h]->autor, autor);
+	strcpy_s(tab[h]->area, area);
+
+	// Retorna a tabela
+	return tab[h];
+
+	}
+
+void remove_Esp (Hash tab, int codigo) {
+	//variavel h recebe o valor do indice
+	int h = funcao_Esp(codigo);
+		
+	if (tab[h]->codigo == codigo) {
+			tab[h] = NULL;
+			printf("\nExemplar excluido!");
+		}
+		else {
+			printf("\nExemplar nao encontrado");
+		}
+}
+
+Acervo* busca_Esp(Hash tab, int codigo) {
+	int h = funcao_Esp(codigo);
+	while (tab[h] != NULL) {
+		if (tab[h]->codigo == codigo)
+			return tab[h];
+		h = (h + 1) % tam;
+	}
+	return NULL;
+}
+
+//função inicializa
+
+void inicializa_Esp(Hash tab) {
+	int i = 0;
+	while (i<tam) {
+		tab[i] = NULL;
+		i++;
+	}
+}
+
+//função imprimi
+
+void imprime_Esp(Hash tab) {
+	int i = 0;
+
+	while (i<tam) {
+		printf("Posição %d:\n", i);
+		if (tab[i] == NULL) {
+			printf("- Disponível \n\n");
+		}
+		else {
+			printf("Codigo....: %d\n", tab[i]->codigo);
+			printf("Titulo..: %s\n", tab[i]->titulo);
+			printf("Autor: %s\n", tab[i]->autor);
+			printf("Area.: %s\n\n", tab[i]->area);
+		}
+
+		i++;
+	}
+}
+
+int main()
+{
+	Acervo* cadLivro;
+	Hash hashLivro;
+
+	inicializa_Esp(hashLivro);
+
+	insere_Esp(hashLivro, 9060, "Todo dia é um dia Especial", "Max Luccado", "nulo");
+	insere_Esp(hashLivro, 1020, "E Agora?", "J. Washington", "nulo");
+
+	cadLivro = busca_Esp(hashLivro, 122221);
+	if (cadLivro == NULL)
+	{
+		printf("Não foi encontrado o Codigo informado.\n\n");
+	}
+	else {
+		printf("O Codigo do Livro informado não foi encontrado:\n");
+		printf("Codigo....: %d\n", cadLivro->codigo);
+		printf("Titulo..: %s\n", cadLivro->titulo);
+		printf("Autor: %s\n", cadLivro->autor);
+		printf("Area.: %s\n\n", cadLivro->area);
+	}
+
+	imprime_Esp(hashLivro);
+
+	remove_Esp(hashLivro, 9060);
+
+	imprime_Esp(hashLivro);
+
+    return 0;
+	system("pause");
+
+}
+
